@@ -175,6 +175,6 @@ void confirm(NSString *title, NSString *message, void (^confirmed)(void)) {
   [alert addAction:cancelButton];
   [alert addAction:confirmButton];
 
-  UIViewController *viewController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
+  UIViewController *viewController = [[[UIApplication sharedApplication] keyWindow] rootViewController];
   [viewController presentViewController:alert animated:YES completion:nil];
 }
