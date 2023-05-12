@@ -1,4 +1,5 @@
 #import "Enmity.h"
+#import "Utils.h"
 
 // Get the path of a plugin via it's name
 NSString* getPluginPath(NSString *name) {
@@ -127,18 +128,7 @@ BOOL isEnabled(NSString *name) {
 }
 
 // Wrap a plugin
-NSString* wrapPlugin(NSString *code, int pluginID, NSString *name) {
-  NSString* plugin = [NSString stringWithFormat:@""\
-    "__d(function(...args) {"\
-      "try {"\
-        "%@"\
-      "} catch(err) {"\
-        "const error = new Error(`Fatal error with %@: ${err}`);"\
-        "console.error(error.stack);"\
-      "}"\
-    "}, %d, []);"\
-    "__r(%d);", code, name, pluginID, pluginID
-  ];
-
+NSString* wrapPlugin(NSString *code, NSString *name) {
+  NSString* plugin = wrapInIIFE([NSString stringWithFormat:@"window.__enmity_init.then(() => {%@})", code], name);
   return plugin;
 }

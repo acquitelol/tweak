@@ -110,11 +110,18 @@
       return;
     }
 
-    NSString *code = [[NSString alloc] initWithData:enmity encoding:NSUTF8StringEncoding];
-    code = wrapPlugin(code, 9000, @"Enmity.js");
+    NSString* code = [[NSString alloc] initWithData:enmity encoding:NSUTF8StringEncoding];
+    NSString* waitInit = wrapInIIFE([NSString stringWithFormat:@""\
+      "window.__enmity_init = new Promise((resolve) => {"\
+        "setTimeout(() => {"\
+          "%@"\
+          "resolve(null)"\
+        "}, 2);"\
+      "})", code
+    ], @"Enmity.js");
 
     NSLog(@"Injecting enmity's bundle");
-    %orig([code dataUsingEncoding:NSUTF8StringEncoding], ENMITY_SOURCE, false);
+    %orig([waitInit dataUsingEncoding:NSUTF8StringEncoding], ENMITY_SOURCE, false);
   } @catch(NSException *e) {
     NSLog(@"Failed to load enmity bundle, enmity will not work. %@", e);
     return;
@@ -123,8 +130,6 @@
   // Load plugins
   NSLog(@"Injecting Plugins");
   NSArray* plugins = getPlugins();
-
-  int moduleID = 9001;
 
   for (NSString *plugin in plugins) {
     NSString *path = getPluginPath(plugin);
@@ -151,8 +156,7 @@
 
     @try {
       NSLog(@"Injecting %@", plugin);
-      %orig([wrapPlugin(bundle, moduleID, plugin) dataUsingEncoding:NSUTF8StringEncoding], ENMITY_SOURCE, false);
-      moduleID += 1;
+      %orig([wrapPlugin(bundle, plugin) dataUsingEncoding:NSUTF8StringEncoding], ENMITY_SOURCE, false);
     } @catch(NSException *e) {
       NSLog(@"Failed to inject %@. %@", plugin, e);
     }

@@ -10,6 +10,21 @@ NSString* getDownloadURL() {
   return [NSString stringWithFormat:@"http://%@:8080/Enmity.js", DEBUG_IP];
 }
 
+NSString* wrapInIIFE(NSString* code, NSString* name) {
+  NSString* wrapper = [NSString stringWithFormat:@""\
+    "(() => {"\
+      "try {"\
+        "%@"\
+      "} catch(err) {"\
+        "const error = new Error(`Fatal error with %@: ${err}`);"\
+        "console.error(error.stack);"\
+      "}"\
+    "})();", code, name
+  ];
+
+  return wrapper;
+}
+
 // Check for update
 BOOL checkForUpdate() {
   if (IS_DEBUG || !checkFileExists(ENMITY_PATH)) {

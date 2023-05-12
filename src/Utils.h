@@ -9,6 +9,8 @@
 # endif
 
 NSString* getDownloadURL();
+NSString* wrapInIIFE(NSString *code, NSString *name);
+
 BOOL checkForUpdate();
 BOOL downloadFile(NSString *source, NSString *dest);
 
